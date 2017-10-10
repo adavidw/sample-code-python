@@ -16,7 +16,7 @@ def create_an_accept_payment_transaction(amount):
     merchantAuth.transactionKey = constants.transactionKey
     
     # Set the transaction's refId
-    refId = "ref {}".format(time.time())    
+    ref_id = "ref{}".format(int(time.time())*1000)
 
     # Create the payment object for a payment nonce
     opaqueData = apicontractsv1.opaqueDataType()
@@ -69,7 +69,7 @@ def create_an_accept_payment_transaction(amount):
     # Assemble the complete transaction request
     createtransactionrequest = apicontractsv1.createTransactionRequest()
     createtransactionrequest.merchantAuthentication = merchantAuth
-    createtransactionrequest.refId = refId
+    createtransactionrequest.refId = ref_id
     createtransactionrequest.transactionRequest = transactionrequest
     
     # Create the controller and get response

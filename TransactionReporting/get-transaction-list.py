@@ -1,5 +1,8 @@
-import os, sys
+"""http://developer.authorize.net/api/reference/#transaction-reporting-get-transaction-list"""
+import os
+import sys
 import imp
+import time
 
 from authorizenet import apicontractsv1
 from authorizenet.apicontrollers import *
@@ -7,12 +10,19 @@ constants = imp.load_source('modulename', 'constants.py')
 from decimal import *
 
 def get_transaction_list():
+
+    # Create a merchantAuthenticationType object with authentication details
+    # retrieved from the constants file
     merchantAuth = apicontractsv1.merchantAuthenticationType()
     merchantAuth.name = constants.apiLoginId
     merchantAuth.transactionKey = constants.transactionKey
 
+    # Set the transaction's refId
+    ref_id = "ref{}".format(int(time.time())*1000)
+
     transactionListRequest = apicontractsv1.getTransactionListRequest()
     transactionListRequest.merchantAuthentication = merchantAuth
+    transactionListRequest.refId = ref_id
     transactionListRequest.batchId = "4551107"
 
     transactionListController = getTransactionListController(transactionListRequest)
@@ -37,9 +47,11 @@ def get_transaction_list():
                 print('Message Code : %s' % transactionListResponse.messages.message[0]['code'].text)
                 print('Message Text : %s' % transactionListResponse.messages.message[0]['text'].text)
         else:
+            print ("ERROR")
             if transactionListResponse.messages is not None:
-                print('Failed to get transaction list.\nCode:%s \nText:%s' % (transactionListResponse.messages.message[0]['code'].text,transactionListResponse.messages.message[0]['text'].text))
-
+                print ("Result code: %s" % transactionListResponse.messages.resultCode)
+                print ("Message code: %s" % transactionListResponse.messages.message[0]['code'].text)
+                print ("Message text: %s" % transactionListResponse.messages.message[0]['text'].text)
     return transactionListResponse
 
 if(os.path.basename(__file__) == os.path.basename(sys.argv[0])):
